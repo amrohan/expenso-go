@@ -12,13 +12,15 @@ func LoadRoutes(r chi.Router) {
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Hello World!"))
 		})
-
 		r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("OK"))
 		})
+
+		r.Post("/login", handlers.LoginUser)
+		r.Post("/register", handlers.RegisterUser)
 	})
 
-	r.Route("/api/transactions", func(r chi.Router) {
+	r.With(handlers.AuthMiddleware).Route("/api/transactions", func(r chi.Router) {
 		r.Post("/", handlers.CreateTransaction)
 		r.Get("/", handlers.GetAllTransaction)
 		r.Get("/{id}", handlers.GetTransactionById)
@@ -30,7 +32,7 @@ func LoadRoutes(r chi.Router) {
 		r.Delete("/{id}", handlers.DeleteTransaction)
 	})
 
-	r.Route("/api/categories", func(r chi.Router) {
+	r.With(handlers.AuthMiddleware).Route("/api/categories", func(r chi.Router) {
 		r.Post("/", handlers.CreateCategory)
 		r.Get("/", handlers.GetAllCategory)
 		r.Get("/{id}", handlers.GetCategoryById)
@@ -39,7 +41,7 @@ func LoadRoutes(r chi.Router) {
 		r.Delete("/{id}", handlers.DeleteCategory)
 	})
 
-	r.Route("/api/accounts", func(r chi.Router) {
+	r.With(handlers.AuthMiddleware).Route("/api/accounts", func(r chi.Router) {
 		r.Post("/", handlers.CreateAccount)
 		r.Get("/", handlers.GetAllAccount)
 		r.Get("/{id}", handlers.GetAccountById)
@@ -48,7 +50,7 @@ func LoadRoutes(r chi.Router) {
 		r.Delete("/{id}", handlers.DeleteAccount)
 	})
 
-	r.Route("/api/users", func(r chi.Router) {
+	r.With(handlers.AuthMiddleware).Route("/api/users", func(r chi.Router) {
 		r.Post("/", handlers.CreateUser)
 		r.Get("/", handlers.GetAllUsers)
 		r.Get("/{id}", handlers.GetUserById)
