@@ -34,6 +34,7 @@ type Category struct {
 	Title     string             `json:"title" bson:"title"`
 	Icon      string             `json:"imageUrl" bson:"imageUrl"`
 	UserId    string             `json:"userId" bson:"userId"`
+	IsDefault string             `json:"isDefault" bson:"isDefault"`
 	CreatedAt time.Time          `json:"createdAt" bson:"createdAt"`
 	UpdatedAt time.Time          `json:"updatedAt" bson:"updatedAt"`
 	DeletedAt time.Time          `json:"deletedAt" bson:"deletedAt"`
@@ -46,6 +47,7 @@ type Account struct {
 	Title     string             `json:"title" bson:"title"`
 	Icon      string             `json:"imageUrl" bson:"imageUrl"`
 	UserId    string             `json:"userId" bson:"userId"`
+	IsDefault string             `json:"isDefault" bson:"isDefault"`
 	CreatedAt time.Time          `json:"createdAt" bson:"createdAt"`
 	UpdatedAt time.Time          `json:"updatedAt" bson:"updatedAt"`
 	DeletedAt time.Time          `json:"deletedAt" bson:"deletedAt"`
