@@ -138,16 +138,15 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username":       existingUser.Username,
-		"userId":         existingUser.Id,
-		"isVerified":     existingUser.IsVerified,
-		"expirationTime": time.Now().Add(time.Minute * 1).Unix(),
-		"exp":            time.Now().Add(1 * time.Minute).Unix(),
-		"iat":            time.Now().Unix(),
-		"nbf":            time.Now().Unix(),
-		"sub":            user.Username,
-		"aud":            "expenso-go",
-		"iss":            "expenso-go",
+		"username":   existingUser.Username,
+		"userId":     existingUser.Id,
+		"isVerified": existingUser.IsVerified,
+		"exp":        time.Now().AddDate(0, 0, 7).Unix(),
+		"iat":        time.Now().Unix(),
+		"nbf":        time.Now().Unix(),
+		"sub":        user.Username,
+		"aud":        "expenso-go",
+		"iss":        "expenso-go",
 	})
 	tokenString, err := token.SignedString([]byte(jwtKey))
 	if err != nil {

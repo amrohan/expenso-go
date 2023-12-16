@@ -18,6 +18,7 @@ func LoadRoutes(r chi.Router) {
 
 		r.Post("/login", handlers.LoginUser)
 		r.Post("/register", handlers.RegisterUser)
+		r.Post("/logout", handlers.LogoutUser)
 	})
 
 	r.With(handlers.AuthMiddleware).Route("/api/transactions", func(r chi.Router) {
