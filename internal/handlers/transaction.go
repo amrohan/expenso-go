@@ -229,6 +229,63 @@ func GetTransactionByMonthAndYear(w http.ResponseWriter, r *http.Request) {
 	helpers.SendResponse(w, http.StatusOK, "Transactions found", transactions, nil)
 }
 
+func GetTransactionByMonthAndYearByUserId(w http.ResponseWriter, r *http.Request) {
+	var transactions []*models.Transaction
+
+	monthStr := chi.URLParam(r, "month")
+	yearStr := chi.URLParam(r, "year")
+	userId := chi.URLParam(r, "userId")
+
+	month, err := strconv.Atoi(monthStr)
+	if err != nil {
+		helpers.SendResponse(w, http.StatusBadRequest, "Please send valid month", nil, err)
+		return
+	}
+
+	year, err := strconv.Atoi(yearStr)
+	if err != nil {
+		helpers.SendResponse(w, http.StatusBadRequest, "Please send valid year", nil, err)
+		return
+	}
+
+	startDate := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	endDate := startDate.AddDate(0, 1, 0)
+
+	client, err := db.GetMongoClient()
+	if err != nil {
+		helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt connect to db", nil, err)
+		return
+	}
+	collection := client.Database(db.Database).Collection(string(db.TransactionCollection))
+	filter := bson.M{
+		"date": bson.M{
+			"$gte": startDate,
+			"$lt":  endDate,
+		},
+		"userId": userId,
+	}
+	cur, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt find transactions", nil, err)
+		return
+	}
+	for cur.Next(context.TODO()) {
+		var transaction models.Transaction
+		err := cur.Decode(&transaction)
+		if err != nil {
+			helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt decode transactions", nil, err)
+			return
+		}
+
+		transactions = append(transactions, &transaction)
+	}
+	if transactions == nil {
+		helpers.SendResponse(w, http.StatusOK, "No transactions found", transactions, nil)
+		return
+	}
+	helpers.SendResponse(w, http.StatusOK, "Transactions found", transactions, nil)
+}
+
 func UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 	var transaction models.Transaction
 

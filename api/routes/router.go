@@ -26,6 +26,7 @@ func LoadRoutes(r chi.Router) {
 		r.Get("/", handlers.GetAllTransaction)
 		r.Get("/{id}", handlers.GetTransactionById)
 		r.Get("/{month}-{year}", handlers.GetTransactionByMonthAndYear)
+		r.Get("/u/{month}-{year}-{userId}", handlers.GetTransactionByMonthAndYearByUserId)
 		r.Get("/user/{id}", handlers.GetTransactionByUserId)
 		r.Get("/category/{id}", handlers.GetTransactionByCategoryId)
 		r.Get("/account/{id}", handlers.GetTransactionByAccountId)
