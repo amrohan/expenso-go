@@ -143,7 +143,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		"exp":        time.Now().AddDate(0, 0, 7).Unix(),
 		"iat":        time.Now().Unix(),
 		"nbf":        time.Now().Unix(),
-		"sub":        user.Id,
+		"sub":        existingUser.Id,
 		"aud":        "expenso-go",
 		"iss":        "expenso-go",
 	})
