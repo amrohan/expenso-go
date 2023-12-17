@@ -139,12 +139,11 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username":   existingUser.Username,
-		"userId":     existingUser.Id,
 		"isVerified": existingUser.IsVerified,
 		"exp":        time.Now().AddDate(0, 0, 7).Unix(),
 		"iat":        time.Now().Unix(),
 		"nbf":        time.Now().Unix(),
-		"sub":        user.Username,
+		"sub":        user.Id,
 		"aud":        "expenso-go",
 		"iss":        "expenso-go",
 	})
