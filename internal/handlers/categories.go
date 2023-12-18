@@ -25,6 +25,7 @@ func CreateCategory(w http.ResponseWriter, r *http.Request) {
 		helpers.SendResponse(w, http.StatusBadRequest, "Please send valid json", nil, err)
 		return
 	}
+	category.Id = primitive.NewObjectID()
 
 	client, err := db.GetMongoClient()
 	if err != nil {
@@ -111,7 +112,7 @@ func GetCategoryByUserId(w http.ResponseWriter, r *http.Request) {
 
 	var categories []*models.Category
 
-	cur, err := collection.Find(context.TODO(), bson.M{"user_id": id})
+	cur, err := collection.Find(context.TODO(), bson.M{"userId": id})
 
 	if err != nil {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Error fetching categories", nil, err)

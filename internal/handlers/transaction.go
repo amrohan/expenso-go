@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -26,6 +25,7 @@ func CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&transaction); err != nil {
 		helpers.SendResponse(w, http.StatusBadRequest, "Couldnt decode request", nil, err)
 	}
+	transaction.Id = primitive.NewObjectID()
 
 	client, err := db.GetMongoClient()
 	if err != nil {
@@ -100,7 +100,7 @@ func GetTransactionByUserId(w http.ResponseWriter, r *http.Request) {
 	}
 	collection := client.Database(db.Database).Collection(string(db.TransactionCollection))
 
-	cur, err := collection.Find(context.TODO(), bson.M{"userId": userId})
+	cur, err := collection.Find(context.TODO(), bson.M{"usersId": userId})
 	if err != nil {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt find transactions", nil, err)
 	}
@@ -114,6 +114,7 @@ func GetTransactionByUserId(w http.ResponseWriter, r *http.Request) {
 
 		transactions = append(transactions, &transaction)
 	}
+
 	helpers.SendResponse(w, http.StatusOK, "Transactions found", transactions, nil)
 }
 
@@ -140,7 +141,6 @@ func GetTransactionByAccountId(w http.ResponseWriter, r *http.Request) {
 
 		transactions = append(transactions, &transaction)
 	}
-	fmt.Println(transactions)
 	helpers.SendResponse(w, http.StatusOK, "Transactions found", transactions, nil)
 }
 

@@ -25,6 +25,8 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	account.Id = primitive.NewObjectID()
+
 	client, err := db.GetMongoClient()
 	if err != nil {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt connect to db", nil, err)
@@ -94,7 +96,7 @@ func GetAccountsByUserId(w http.ResponseWriter, r *http.Request) {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt connect to db", nil, err)
 	}
 	collection := client.Database(db.Database).Collection(string(db.AccountCollection))
-	cur, err := collection.Find(context.TODO(), bson.M{"user_id": id})
+	cur, err := collection.Find(context.TODO(), bson.M{"userId": id})
 	if err != nil {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt find transaction", nil, err)
 		return
