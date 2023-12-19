@@ -100,7 +100,7 @@ func GetTransactionByUserId(w http.ResponseWriter, r *http.Request) {
 	}
 	collection := client.Database(db.Database).Collection(string(db.TransactionCollection))
 
-	cur, err := collection.Find(context.TODO(), bson.M{"usersId": userId})
+	cur, err := collection.Find(context.TODO(), bson.M{"userId": userId})
 	if err != nil {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt find transactions", nil, err)
 	}
