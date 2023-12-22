@@ -88,7 +88,7 @@ func GetCategoryById(w http.ResponseWriter, r *http.Request) {
 
 	var category *models.Category
 
-	if err := collection.FindOne(r.Context(), bson.M{"id": id}).Decode(&category); err != nil {
+	if err := collection.FindOne(r.Context(), bson.M{"_id": id}).Decode(&category); err != nil {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Error fetching category", nil, err)
 		return
 	}
@@ -146,7 +146,7 @@ func UpdateCategory(w http.ResponseWriter, r *http.Request) {
 	}
 	collection := client.Database(db.Database).Collection(string(db.CategoryCollection))
 
-	data, err := collection.UpdateOne(r.Context(), bson.M{"id": category.Id}, bson.M{"$set": category})
+	data, err := collection.UpdateOne(r.Context(), bson.M{"_id": category.Id}, bson.M{"$set": category})
 	if err != nil {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Error updating category", nil, err)
 		return
@@ -155,10 +155,9 @@ func UpdateCategory(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteCategory(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	if id == "" {
-		helpers.SendResponse(w, http.StatusBadRequest, "Please provide a valid id", nil, nil)
-		return
+	id, err := primitive.ObjectIDFromHex(chi.URLParam(r, "id"))
+	if err != nil {
+		helpers.SendResponse(w, http.StatusBadRequest, "Invalid id", nil, err)
 	}
 
 	client, err := db.GetMongoClient()
@@ -169,7 +168,7 @@ func DeleteCategory(w http.ResponseWriter, r *http.Request) {
 
 	collection := client.Database(db.Database).Collection(string(db.CategoryCollection))
 
-	if _, err := collection.DeleteOne(r.Context(), bson.M{"id": id}); err != nil {
+	if _, err := collection.DeleteOne(r.Context(), bson.M{"_id": id}); err != nil {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Error deleting category", nil, err)
 		return
 	}

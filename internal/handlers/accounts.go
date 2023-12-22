@@ -146,7 +146,7 @@ func DeleteAccount(w http.ResponseWriter, r *http.Request) {
 	}
 	collection := client.Database(db.Database).Collection(string(db.AccountCollection))
 
-	data, err := collection.DeleteOne(r.Context(), bson.M{"id": id})
+	data, err := collection.DeleteOne(r.Context(), bson.M{"_id": id})
 	if err != nil {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Error deleting account", nil, err)
 		return
