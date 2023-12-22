@@ -229,6 +229,63 @@ func GetTransactionByMonthAndYear(w http.ResponseWriter, r *http.Request) {
 	helpers.SendResponse(w, http.StatusOK, "Transactions found", transactions, nil)
 }
 
+// func GetTransactionByMonthAndYearByUserId(w http.ResponseWriter, r *http.Request) {
+// 	var transactions []*models.Transaction
+
+// 	monthStr := chi.URLParam(r, "month")
+// 	yearStr := chi.URLParam(r, "year")
+// 	userId := chi.URLParam(r, "userId")
+
+// 	month, err := strconv.Atoi(monthStr)
+// 	if err != nil {
+// 		helpers.SendResponse(w, http.StatusBadRequest, "Please send valid month", nil, err)
+// 		return
+// 	}
+
+// 	year, err := strconv.Atoi(yearStr)
+// 	if err != nil {
+// 		helpers.SendResponse(w, http.StatusBadRequest, "Please send valid year", nil, err)
+// 		return
+// 	}
+
+// 	startDate := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+// 	endDate := startDate.AddDate(0, 1, 0)
+
+// 	client, err := db.GetMongoClient()
+// 	if err != nil {
+// 		helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt connect to db", nil, err)
+// 		return
+// 	}
+// 	collection := client.Database(db.Database).Collection(string(db.TransactionCollection))
+// 	filter := bson.M{
+// 		"date": bson.M{
+// 			"$gte": startDate,
+// 			"$lt":  endDate,
+// 		},
+// 		"userId": userId,
+// 	}
+// 	cur, err := collection.Find(context.TODO(), filter)
+// 	if err != nil {
+// 		helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt find transactions", nil, err)
+// 		return
+// 	}
+// 	for cur.Next(context.TODO()) {
+// 		var transaction models.Transaction
+// 		err := cur.Decode(&transaction)
+// 		if err != nil {
+// 			helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt decode transactions", nil, err)
+// 			return
+// 		}
+
+// 		transactions = append(transactions, &transaction)
+// 	}
+// 	if transactions == nil {
+// 		helpers.SendResponse(w, http.StatusOK, "No transactions found", transactions, nil)
+// 		return
+// 	}
+// 	helpers.SendResponse(w, http.StatusOK, "Transactions found", transactions, nil)
+// }
+
 func GetTransactionByMonthAndYearByUserId(w http.ResponseWriter, r *http.Request) {
 	var transactions []*models.Transaction
 
@@ -238,13 +295,13 @@ func GetTransactionByMonthAndYearByUserId(w http.ResponseWriter, r *http.Request
 
 	month, err := strconv.Atoi(monthStr)
 	if err != nil {
-		helpers.SendResponse(w, http.StatusBadRequest, "Please send valid month", nil, err)
+		helpers.SendResponse(w, http.StatusBadRequest, "Please send a valid month", nil, err)
 		return
 	}
 
 	year, err := strconv.Atoi(yearStr)
 	if err != nil {
-		helpers.SendResponse(w, http.StatusBadRequest, "Please send valid year", nil, err)
+		helpers.SendResponse(w, http.StatusBadRequest, "Please send a valid year", nil, err)
 		return
 	}
 
@@ -253,7 +310,7 @@ func GetTransactionByMonthAndYearByUserId(w http.ResponseWriter, r *http.Request
 
 	client, err := db.GetMongoClient()
 	if err != nil {
-		helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt connect to db", nil, err)
+		helpers.SendResponse(w, http.StatusInternalServerError, "Couldn't connect to the database", nil, err)
 		return
 	}
 	collection := client.Database(db.Database).Collection(string(db.TransactionCollection))
@@ -266,24 +323,40 @@ func GetTransactionByMonthAndYearByUserId(w http.ResponseWriter, r *http.Request
 	}
 	cur, err := collection.Find(context.TODO(), filter)
 	if err != nil {
-		helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt find transactions", nil, err)
+		helpers.SendResponse(w, http.StatusInternalServerError, "Couldn't find transactions", nil, err)
 		return
 	}
+
+	var totalIncome, totalExpense int
+
 	for cur.Next(context.TODO()) {
 		var transaction models.Transaction
 		err := cur.Decode(&transaction)
 		if err != nil {
-			helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt decode transactions", nil, err)
+			helpers.SendResponse(w, http.StatusInternalServerError, "Couldn't decode transactions", nil, err)
 			return
 		}
 
 		transactions = append(transactions, &transaction)
+
+		if transaction.Type == "Income" {
+			totalIncome += transaction.Amount
+		} else if transaction.Type == "Expense" {
+			totalExpense += transaction.Amount
+		}
 	}
+
+	summary := map[string]int{
+		"totalIncome":  totalIncome,
+		"totalExpense": totalExpense,
+	}
+
 	if transactions == nil {
-		helpers.SendResponse(w, http.StatusOK, "No transactions found", transactions, nil)
+		helpers.SendResponse(w, http.StatusOK, "No transactions found", summary, nil)
 		return
 	}
-	helpers.SendResponse(w, http.StatusOK, "Transactions found", transactions, nil)
+
+	helpers.SendResponse(w, http.StatusOK, "Transactions found", map[string]interface{}{"transaction": transactions, "summary": summary}, nil)
 }
 
 func UpdateTransaction(w http.ResponseWriter, r *http.Request) {
