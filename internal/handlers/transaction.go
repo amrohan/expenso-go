@@ -352,7 +352,7 @@ func GetTransactionByMonthAndYearByUserId(w http.ResponseWriter, r *http.Request
 	}
 
 	if transactions == nil {
-		helpers.SendResponse(w, http.StatusOK, "No transactions found", summary, nil)
+		helpers.SendResponse(w, http.StatusOK, "No transactions found", map[string]interface{}{"transaction": transactions, "summary": summary}, nil)
 		return
 	}
 
