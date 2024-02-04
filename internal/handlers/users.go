@@ -82,6 +82,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Error getting user", nil, err)
 		return
 	}
+	user.Password = ""
 	helpers.SendResponse(w, http.StatusOK, "User fetched successfully", user, nil)
 }
 
@@ -99,12 +100,22 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Error connecting to mongo", nil, err)
 		return
 	}
+	// Retrieve the existing user from the database
+	existingUser := models.User{}
 	collection := client.Database(db.Database).Collection(string(db.UserCollection))
+	if err := collection.FindOne(context.TODO(), bson.M{"_id": user.Id}).Decode(&existingUser); err != nil {
+		helpers.SendResponse(w, http.StatusInternalServerError, "Error retrieving user", nil, err)
+		return
+	}
+	// Keep the existing password
+
+	user.Password = existingUser.Password
 	_, err = collection.UpdateOne(context.TODO(), bson.M{"_id": user.Id}, bson.M{"$set": user})
 	if err != nil {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Error updating user", nil, err)
 		return
 	}
+	user.Password = ""
 	helpers.SendResponse(w, http.StatusOK, "User updated successfully", user, nil)
 }
 
@@ -163,6 +174,25 @@ func GetUserByUsername(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	helpers.SendResponse(w, http.StatusOK, "User fetched successfully", user, nil)
+}
+
+// check if username exists or not
+func CheckUsername(w http.ResponseWriter, r *http.Request) {
+	username := chi.URLParam(r, "username")
+
+	client, err := db.GetMongoClient()
+	if err != nil {
+		helpers.SendResponse(w, http.StatusInternalServerError, "Error connecting to mongo", nil, err)
+		return
+	}
+
+	collection := client.Database(db.Database).Collection(string(db.UserCollection))
+	var user models.User
+	if err = collection.FindOne(context.TODO(), bson.M{"username": username}).Decode(&user); err != nil {
+		helpers.SendResponse(w, http.StatusOK, "Username available", nil, nil)
+		return
+	}
+	helpers.SendResponse(w, http.StatusOK, "Username already exists", nil, nil)
 }
 
 func GetAllDeletedUser(w http.ResponseWriter, r *http.Request) {

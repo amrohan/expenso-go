@@ -58,6 +58,7 @@ func LoadRoutes(r chi.Router) {
 		r.Get("/{id}", handlers.GetUserById)
 		r.Get("/email/{email}", handlers.GetUserByEmail)
 		r.Get("/username/{username}", handlers.GetUserByUsername)
+		r.Get("/u/{username}", handlers.CheckUsername)
 		r.Get("/du/", handlers.GetAllDeletedUser)
 		r.Post("/du/{id}", handlers.RestoreUser)
 		r.Put("/", handlers.UpdateUser)
