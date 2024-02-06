@@ -23,7 +23,7 @@ func main() {
 		middleware.Logger,
 		middleware.CleanPath,
 		cors.Handler(cors.Options{
-			AllowedOrigins:   []string{"https://localhost:4200", "http://localhost:4200"},
+			AllowedOrigins:   []string{"https://expenso.pages.dev", "https://localhost:4200", "http://localhost:4200"},
 			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 			ExposedHeaders:   []string{"Link"},
@@ -35,6 +35,5 @@ func main() {
 	routes.LoadRoutes(r)
 
 	fmt.Println("Server is running on port " + port)
-	http.ListenAndServe(":3000", r)
-
+	http.ListenAndServe(":"+port, r)
 }
