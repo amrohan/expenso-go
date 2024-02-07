@@ -36,7 +36,7 @@ func GetMongoClient() (*mongo.Client, error) {
 		err := godotenv.Load()
 
 		if err != nil {
-			log.Fatal("Error loading .env file:", err)
+			log.Printf("Error loading .env file")
 		}
 
 		MongoURl := os.Getenv("MONGO_URL")
