@@ -153,8 +153,9 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.SetCookie(w, &http.Cookie{
-		Name:  "token",
-		Value: tokenString,
+		Name:     "token",
+		Value:    tokenString,
+		SameSite: http.SameSiteNoneMode,
 	})
 	helpers.SendResponse(w, http.StatusOK, "Login successful", map[string]string{"token": tokenString}, nil)
 
@@ -162,9 +163,10 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 
 func LogoutUser(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
-		Name:   "token",
-		Value:  "",
-		MaxAge: -1,
+		Name:     "token",
+		Value:    "",
+		MaxAge:   -1,
+		SameSite: http.SameSiteNoneMode,
 	})
 	helpers.SendResponse(w, http.StatusOK, "Logout successful", nil, nil)
 }
