@@ -156,6 +156,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		Name:     "token",
 		Value:    tokenString,
 		SameSite: http.SameSiteNoneMode,
+		Secure:   true,
 	})
 	helpers.SendResponse(w, http.StatusOK, "Login successful", map[string]string{"token": tokenString}, nil)
 
@@ -167,6 +168,7 @@ func LogoutUser(w http.ResponseWriter, r *http.Request) {
 		Value:    "",
 		MaxAge:   -1,
 		SameSite: http.SameSiteNoneMode,
+		Secure:   true,
 	})
 	helpers.SendResponse(w, http.StatusOK, "Logout successful", nil, nil)
 }
