@@ -35,11 +35,13 @@ func CreateCategory(w http.ResponseWriter, r *http.Request) {
 
 	collection := client.Database(db.Database).Collection(string(db.CategoryCollection))
 
-	if _, err := collection.InsertOne(r.Context(), category); err != nil {
+	data, err := collection.InsertOne(r.Context(), category)
+	if err != nil {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Error creating category", nil, err)
 		return
 	}
-	helpers.SendResponse(w, http.StatusCreated, "Category created successfully", nil, nil)
+	category.Id = data.InsertedID.(primitive.ObjectID)
+	helpers.SendResponse(w, http.StatusCreated, "Category created successfully", category, nil)
 }
 
 func GetAllCategory(w http.ResponseWriter, r *http.Request) {

@@ -37,7 +37,10 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		helpers.SendResponse(w, http.StatusInternalServerError, "Couldnt create account", nil, err)
 	}
-	helpers.SendResponse(w, http.StatusOK, "Account created", data, nil)
+
+	account.Id = data.InsertedID.(primitive.ObjectID)
+
+	helpers.SendResponse(w, http.StatusOK, "Account created", account, nil)
 }
 
 func GetAllAccount(w http.ResponseWriter, r *http.Request) {
